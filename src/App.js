@@ -1,26 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Users from "./containers/Users/Users";
+import AddUser from "./components/User/UserControls/AddUser";
+import EditUser from "./components/User/UserControls/EditUser";
+import Header from "./containers/Layout/Header";
+import PageNotFound from "./components/pages/404";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import { Provider } from "react-redux";
+import store from "./store/store";
+
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
+
+class App extends Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <Router>
+          <div className="App">
+            <Header />
+            <div className="container">
+              <Switch>
+                <Route exact path="/" component={Users} />
+                <Route exact path="/user/add" component={AddUser} />
+                <Route exact path="/user/edit/:id" component={EditUser} />
+                <Route component={PageNotFound} />
+              </Switch>
+            </div>
+          </div>
+        </Router>
+      </Provider>
+    );
+  }
 }
 
 export default App;
