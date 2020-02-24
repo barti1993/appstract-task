@@ -1,85 +1,76 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Input from "../../UI/Input/Input";
 import { connect } from "react-redux";
 import { getUser, updateUser } from "../../../store/actions/userActions";
 
-class EditUser extends Component {
-  state = {
+const EditUser = props => {
+  const [data, setData] = useState({
     name: "",
     errors: {}
-  };
+  });
 
-  componentWillReceiveProps(nextProps, nextState) {
-    const { name } = nextProps.user;
-    this.setState({
-      name
-    });
-  }
+  const { getUser } = props;
+  useEffect(() => {
+    const { id } = props.match.params;
+    getUser(id);
+  }, [getUser]);
 
-  componentDidMount() {
-    const { id } = this.props.match.params;
-    this.props.getUser(id);
-  }
-
-  onSubmit = e => {
+  const onSubmit = e => {
     e.preventDefault();
 
-    const { name } = this.state;
+    const { name } = data;
 
-    if (name === "") {
-      this.setState({ errors: { name: "Name is required" } });
+    if (name === "" || name === undefined) {
+      setData({ errors: { name: "Name is required" } });
       return;
     }
 
-    const { id } = this.props.match.params;
+    const { id } = props.match.params;
 
     const upatedUser = {
       id,
       name
     };
 
-    this.props.updateUser(upatedUser);
+    props.updateUser(upatedUser);
 
-    this.setState({
+    setData({
       name: "",
       errors: {}
     });
 
-    this.props.history.push("/");
+    props.history.push("/");
   };
 
-  onChange = e => this.setState({ [e.target.name]: e.target.value });
+  const onChange = e => setData({ [e.target.name]: e.target.value });
 
-  render() {
-    const { name, errors } = this.state;
+  const { name, errors } = props;
 
-    return (
+  return (
+    <div>
+      <h1>Edit User</h1>
       <div>
-        <h1>Edit User</h1>
-        <div>
-          <form onSubmit={this.onSubmit}>
-            <Input
-              label="Full Name"
-              name="name"
-              placeholder="Enter Name"
-              value={name}
-              onChange={this.onChange}
-              error={errors.name}
-            />
-
-            <input type="submit" value="Update" className="btn btn-dark" />
-            <Link to={`/`}>
-              <button className="btn btn-dark" style={{ marginLeft: "10px" }}>
-                Back
-              </button>
-            </Link>
-          </form>
-        </div>
+        <form onSubmit={onSubmit}>
+          <Input
+            label="Full Name"
+            name="name"
+            placeholder="Enter Name"
+            value={name}
+            onChange={onChange}
+            error={errors}
+          />
+          <input type="submit" value="Update" className="btn btn-dark" />
+          <Link to={`/`}>
+            <button className="btn btn-dark" style={{ marginLeft: "10px" }}>
+              Back
+            </button>
+          </Link>
+        </form>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 const mapStateToProps = state => ({
   user: state.user.user
